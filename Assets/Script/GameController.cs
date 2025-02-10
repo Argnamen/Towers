@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Zenject;
 
 public class GameController : IInitializable
 {
@@ -36,5 +37,17 @@ public class GameController : IInitializable
             // Показать сообщение о недопустимом ходе
             _gameUI.ShowInvalidMoveMessage();
         }
+    }
+
+    /// <summary>
+    /// Рестарт уровня.
+    /// </summary>
+    public void RestartLevel()
+    {
+        // Переинициализируем основы и кольца
+        _gameState.InitializePegs();
+
+        // Обновляем UI
+        _gameUI.UpdateMovesLeft(_gameState.MovesLeft);
     }
 }

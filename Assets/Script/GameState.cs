@@ -23,7 +23,7 @@ public class GameState
     /// <summary>
     /// Инициализирует основы и кольца в соответствии с текущим уровнем.
     /// </summary>
-    private void InitializePegs()
+    public void InitializePegs()
     {
         // Очищаем все основы
         foreach (var peg in _pegs)
