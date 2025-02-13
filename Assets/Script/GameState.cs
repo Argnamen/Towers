@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 public class GameState
@@ -8,12 +9,20 @@ public class GameState
 
     private Level _currentLevel;
     private List<Peg> _pegs;
+    private List<Ring> _rings;
 
-    public GameState(Level level, List<Peg> pegs)
+    private readonly LevelManager _levelManager;
+    private readonly ResultService _resultService;
+
+    public GameState(LevelManager levelManager, List<Peg> pegs, List<Ring> rings, ResultService resultService)
     {
-        _currentLevel = level;
+        _levelManager = levelManager;
+        _resultService = resultService;
+
+        _currentLevel = _levelManager.CurrentLevel;
         _pegs = pegs;
-        MovesLeft = level.MaxMoves;
+        _rings = rings;
+        MovesLeft = _currentLevel.MaxMoves;
         IsLevelComplete = false;
 
         // Инициализируем основы и кольца
@@ -31,18 +40,12 @@ public class GameState
             peg.Rings.Clear();
         }
 
-        // Пример начального состояния: все кольца на первой основе
-        var rings = new List<Ring>
-        {
-            new Ring(3),
-            new Ring(2),
-            new Ring(1)
-        };
-
         // Размещаем кольца на первой основе
-        foreach (var ring in rings)
+        for (int i = 0; i < _rings.Count; i++)
         {
-            _pegs[0].AddRing(ring);
+            _pegs[0].AddRing(_rings[i]);
+
+            _rings[i].Initialize(i + 1);
         }
     }
 
@@ -87,6 +90,7 @@ public class GameState
     private bool CanMoveRing(Ring ring, Peg targetPeg)
     {
         // Кольцо можно переместить, если целевая основа пуста или верхнее кольцо на ней больше текущего
+
         return targetPeg.Rings.Count == 0 || ring.Size < targetPeg.Rings.Last().Size;
     }
 
@@ -100,7 +104,23 @@ public class GameState
         string currentState = GetCurrentState();
 
         // Сравниваем с целевым состоянием
-        return currentState == _currentLevel.TargetState;
+        return currentState == _currentLevel.TargetState.Replace("0", "");
+    }
+
+    /// <summary>
+    /// Перезагрузка уровня после победы и обновление данных уровня.
+    /// </summary>
+    public void UpdateLevel()
+    {
+        _resultService.SaveResult(_levelManager.CurrentLevel.Number, MovesLeft);
+
+        _levelManager.NextLevel();
+
+        _currentLevel = _levelManager.CurrentLevel;
+
+        _currentLevel = _levelManager.CurrentLevel;
+        MovesLeft = _currentLevel.MaxMoves;
+        IsLevelComplete = false;
     }
 
     /// <summary>

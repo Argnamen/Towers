@@ -2,10 +2,29 @@ using UnityEngine;
 
 public class PegView : MonoBehaviour
 {
-    public Peg Peg { get; set; }
+    private Peg _peg; // Ссылка на логику основы
+    private Renderer _renderer; // Компонент для визуального представления
+
+    private void Awake()
+    {
+        _peg = GetComponent<Peg>();
+        _renderer = GetComponent<Renderer>();
+    }
+
+    private void OnMouseEnter()
+    {
+        // Подсветка основы при наведении
+        _renderer.material.color = Color.yellow;
+    }
 
     private void OnMouseDown()
     {
-        // Обработка клика на основе
+        _peg.Select();
+    }
+
+    private void OnMouseExit()
+    {
+        // Возвращаем обычный цвет
+        _renderer.material.color = Color.white;
     }
 }

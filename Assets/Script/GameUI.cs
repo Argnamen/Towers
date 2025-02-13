@@ -1,12 +1,14 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private Text movesLeftText; // Текст для отображения оставшихся ходов
-    [SerializeField] private Text messageText;   // Текст для отображения сообщений
+    [SerializeField] private TMP_Text movesLeftText; // Текст для отображения оставшихся ходов
+    [SerializeField] private TMP_Text messageText;   // Текст для отображения сообщений
     [SerializeField] private Button restartButton; // Кнопка рестарта
+    [SerializeField] private Button winButton; // Кнопка победы
 
     private GameController _gameController;
 
@@ -22,9 +24,11 @@ public class GameUI : MonoBehaviour
         // Скрываем сообщение и кнопку рестарта при старте
         messageText.gameObject.SetActive(false);
         restartButton.gameObject.SetActive(false);
+        winButton.gameObject.SetActive(false);
 
         // Назначаем обработчик для кнопки рестарта
         restartButton.onClick.AddListener(OnRestartButtonClicked);
+        winButton.onClick.AddListener(OnNextLevelButtonClicked);
     }
 
     /// <summary>
@@ -42,6 +46,16 @@ public class GameUI : MonoBehaviour
     public void ShowLevelComplete()
     {
         messageText.text = "Уровень завершен!";
+        messageText.gameObject.SetActive(true);
+        winButton.gameObject.SetActive(true); // Показываем кнопку рестарта
+    }
+
+    /// <summary>
+    /// Показывает сообщение о завершении уровня.
+    /// </summary>
+    public void ShowLevelFail()
+    {
+        messageText.text = "Уровень проигран!";
         messageText.gameObject.SetActive(true);
         restartButton.gameObject.SetActive(true); // Показываем кнопку рестарта
     }
@@ -64,6 +78,19 @@ public class GameUI : MonoBehaviour
     private void HideMessage()
     {
         messageText.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Обработчик нажатия на кнопку следующего уровня.
+    /// </summary>
+    private void OnNextLevelButtonClicked()
+    {
+        // Скрываем сообщение и кнопку рестарта
+        messageText.gameObject.SetActive(false);
+        winButton.gameObject.SetActive(false);
+
+        // Вызываем метод рестарта уровня через GameController
+        _gameController.NextLevel();
     }
 
     /// <summary>
